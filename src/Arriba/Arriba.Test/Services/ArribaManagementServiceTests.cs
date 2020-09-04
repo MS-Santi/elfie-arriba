@@ -1,6 +1,7 @@
 ﻿using Arriba.Caching;
 using Arriba.Communication.Server.Application;
 using Arriba.Configuration;
+using Arriba.Diagnostics.SemanticLogging.EventSourceImplementation;
 using Arriba.Model;
 using Arriba.Model.Column;
 using Arriba.Model.Security;
@@ -44,7 +45,8 @@ namespace Arriba.Test.Services
             var securityConfiguration = new ArribaServerConfiguration();
             securityConfiguration.EnabledAuthentication = true;
             var claimsAuth = new ClaimsAuthenticationService(new MemoryCacheFactory());
-            var factory = new ArribaManagementServiceFactory(_databaseFactory.GetDatabase(), claimsAuth, securityConfiguration);
+            var telemetry = new ArribaManagementServiceTelemetrySource();
+            var factory = new ArribaManagementServiceFactory(_databaseFactory.GetDatabase(), claimsAuth, securityConfiguration, telemetry);
 
             _service = factory.CreateArribaManagementService("Users");
             _db = _service.GetDatabaseForOwner(_owner);

@@ -6,8 +6,13 @@ using System.Text;
 
 namespace Arriba.Diagnostics.SemanticLogging.EventSourceImplementation
 {
-    public abstract class ArribaManagementServiceTelemetrySource : EventSource, IArribaManagementServiceTelemetrySource
+    public class ArribaManagementServiceTelemetrySource : EventSource, IArribaManagementServiceTelemetrySource
     {
+        public ArribaManagementServiceTelemetrySource()
+    : base(nameof(ArribaManagementServiceTelemetrySource))
+        {
+        }
+
         [Event(1)]
         public void NotifyAllUserTablesUnloaded()
         {
