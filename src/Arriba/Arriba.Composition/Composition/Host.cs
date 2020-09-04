@@ -22,6 +22,8 @@ using Arriba.Server.Authentication;
 using Arriba.Server.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Arriba.Diagnostics.SemanticLogging.EventSourceImplementation;
+using Arriba.Diagnostics.SemanticLogging.Contracts;
 
 namespace Arriba.Composition
 {
@@ -31,7 +33,7 @@ namespace Arriba.Composition
         {
             services.AddSingleton<ArribaLog>();
             services.AddSingleton<ISecurityConfiguration>(config);
-         
+
             services.AddContentReadersWriters();
             services.AddJsonConverters();
 
@@ -48,11 +50,17 @@ namespace Arriba.Composition
 
             services.AddTransient<IApplication, RoutedApplicationHandler>();
             services.AddSingleton<ApplicationServer, ComposedApplicationServer>();
-        }
 
+            RegisterTelemetrySources(services);
+
+        }
+         static void RegisterTelemetrySources(IServiceCollection services)
+        {
+            services.AddSingleton<IArribaManagementServiceTelemetrySource, ArribaManagementServiceTelemetrySource>();
+        }
         private static void AddContentReadersWriters(this IServiceCollection services)
         {
-            services.AddTransient<IContentReader,StringContentReader>();
+            services.AddTransient<IContentReader, StringContentReader>();
             services.AddTransient<IContentReader, JsonContentReader>();
             services.AddTransient<IContentWriter, StringContentWriter>();
             services.AddTransient<IContentWriter, JsonContentWriter>();
@@ -64,7 +72,7 @@ namespace Arriba.Composition
 
         private static void AddJsonConverters(this IServiceCollection services)
         {
-            services.AddTransient<JsonConverter,ColumnDetailsJsonConverter>();
+            services.AddTransient<JsonConverter, ColumnDetailsJsonConverter>();
             services.AddTransient<JsonConverter, DataBlockJsonConverter>();
             services.AddTransient<JsonConverter, IAggregatorJsonConverter>();
             services.AddTransient<JsonConverter, IExpressionJsonConverter>();

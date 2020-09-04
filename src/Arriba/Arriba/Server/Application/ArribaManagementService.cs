@@ -11,6 +11,7 @@ using Arriba.Model.Security;
 using Arriba.ParametersCheckers;
 using Arriba.Server.Authentication;
 using Arriba.Types;
+using Arriba.Diagnostics.SemanticLogging.Contracts;
 
 namespace Arriba.Communication.Server.Application
 {
@@ -19,12 +20,14 @@ namespace Arriba.Communication.Server.Application
         private readonly SecureDatabase _database;
         private readonly IArribaAuthorization _arribaAuthorization;
         private readonly ICorrector _correctors;
+        private readonly IArribaManagementServiceTelemetrySource _telemetrySource;
 
-        public ArribaManagementService(SecureDatabase secureDatabase, ICorrector composedCorrector, ClaimsAuthenticationService claims, ISecurityConfiguration securityConfiguration)
+        public ArribaManagementService(SecureDatabase secureDatabase, ICorrector composedCorrector, ClaimsAuthenticationService claims, ISecurityConfiguration securityConfiguration, IArribaManagementServiceTelemetrySource telemetrySource)
         {
             _database = secureDatabase;
             _arribaAuthorization = new ArribaAuthorizationGrantDecorator(_database, claims, securityConfiguration);
             _correctors = composedCorrector;
+            _telemetrySource = telemetrySource;
         }
 
         private ICorrector CurrentCorrectors(IPrincipal user)

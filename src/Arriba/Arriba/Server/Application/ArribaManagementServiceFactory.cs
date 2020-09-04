@@ -1,4 +1,5 @@
 ﻿using Arriba.Configuration;
+using Arriba.Diagnostics.SemanticLogging.Contracts;
 using Arriba.Model;
 using Arriba.Model.Correctors;
 using Arriba.ParametersCheckers;
@@ -13,8 +14,9 @@ namespace Arriba.Communication.Server.Application
         private readonly SecureDatabase secureDatabase;
         private readonly ClaimsAuthenticationService _claimsAuth;
         private readonly ISecurityConfiguration _securityConfiguration;
+        private readonly IArribaManagementServiceTelemetrySource _telemetrySource;
 
-        public ArribaManagementServiceFactory(SecureDatabase secureDatabase, ClaimsAuthenticationService claims, ISecurityConfiguration securityConfiguration)
+        public ArribaManagementServiceFactory(SecureDatabase secureDatabase, ClaimsAuthenticationService claims, ISecurityConfiguration securityConfiguration, IArribaManagementServiceTelemetrySource telemetrySource)
         {
             ParamChecker.ThrowIfNull(secureDatabase, nameof(secureDatabase));
             ParamChecker.ThrowIfNull(claims, nameof(claims));
@@ -23,6 +25,7 @@ namespace Arriba.Communication.Server.Application
             this.secureDatabase = secureDatabase;
             _claimsAuth = claims;
             _securityConfiguration = securityConfiguration;
+            _telemetrySource = telemetrySource;
         }
 
         public IArribaManagementService CreateArribaManagementService(string userAliasCorrectorTable = "")
@@ -32,7 +35,7 @@ namespace Arriba.Communication.Server.Application
 
             var correctors = new ComposedCorrector(new TodayCorrector(), new UserAliasCorrector(secureDatabase[userAliasCorrectorTable]));
 
-            return new ArribaManagementService(secureDatabase, correctors, _claimsAuth, _securityConfiguration);
+            return new ArribaManagementService(secureDatabase, correctors, _claimsAuth, _securityConfiguration, _telemetrySource);
         }
     }
 }
